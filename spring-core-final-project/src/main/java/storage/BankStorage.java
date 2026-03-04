@@ -5,12 +5,13 @@ import model.User;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class BankStorage {
     private final Map<Integer, User> users;
     private final Map<Integer, Account> accounts;
+    private int lastUserId = 0;
+    private int lastAccountId = 0;
 
     public BankStorage() {
         users = new HashMap<>();
@@ -26,17 +27,11 @@ public class BankStorage {
     }
 
     public boolean isUsersLoginExist(String login) {
-        AtomicBoolean isUsersLoginExist = new AtomicBoolean(false);
-
-        users.forEach((key, value) -> {
-            isUsersLoginExist.set(value.getLogin().equals(login));
-        });
-
-        return isUsersLoginExist.get();
+        return users.values().stream().anyMatch(user -> user.getLogin().equals(login));
     }
 
     public int getNextUserId() {
-        return users.size() + 1;
+        return ++lastUserId;
     }
 
     public void addUser(int id, User user) {
@@ -58,7 +53,7 @@ public class BankStorage {
     }
 
     public int getNextAccountId() {
-        return accounts.size() + 1;
+        return ++lastAccountId;
     }
 
     public boolean isAccountExit(int id) {
